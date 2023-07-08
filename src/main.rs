@@ -1,9 +1,9 @@
 // #![allow(unused)]
 
-mod prelude;
-mod error;
-mod config;
 mod cmd;
+mod config;
+mod error;
+mod prelude;
 
 use crate::prelude::*;
 use std::path::PathBuf;
@@ -16,7 +16,7 @@ use tokio::io;
 async fn main() -> Result<()> {
     let args = cmd::parse();
     let conf = config::load(PathBuf::from(args.config_path))?;
-    
+
     LogBuilder::with_level(&conf.log.level)
         .with_default_writer(new_writer(io::stdout()))
         .init();
