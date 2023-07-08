@@ -1,0 +1,5 @@
+log:
+  level: INFO
+port: 9080
+db:
+  url: postgres://localhost:5432/postgres
