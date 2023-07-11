@@ -1,0 +1,13 @@
+{
+    "protoc": {
+        "path": "/usr/bin/protoc",
+        "compile_on_save": false,
+        "options": [
+            "--allow_alias=true",
+            "--proto_path=protos/v3",
+            "--proto_path=protos/v2",
+            "--proto_path=proto",
+            "--proto_path=${workspaceRoot}/proto/v1",
+        ]
+    }
+}

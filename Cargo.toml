@@ -9,9 +9,17 @@ clap = { version = "4.3.5", features = ["derive", "env"] }
 twelf = { version="0.11.0", features = ["yaml"]}
 thiserror= "1.0.40"
 tokio = { version = "1.28.2", features = ["full"] }
+# tokio-stream = { version = "0.1.14", features = ["net"] }
 serde = "1.0.164"
 serde_json = "1.0.97"
 log = { version = "0.4.19", features = ["kv_unstable_serde"], default-features = false }
 structured-logger="1.0.1"
 
+async-trait = "0.1.68"
+tonic = "0.9.2"
+tonic-reflection = "0.9.2"
+prost = "0.11.9"
+prost-types = "0.11.9"
 
+[build-dependencies]
+tonic-build = "0.9.2"

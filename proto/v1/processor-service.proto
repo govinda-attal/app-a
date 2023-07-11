@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package auction.v1;
+
+import "model.proto";
+
+message NewAuctionRq {
+    AuctionInfo info = 1;
+}
+
+message NewAuctionRs {
+    AuctionRec rec = 1;
+}
+
+
+message NewBidRq {
+    BidInfo info = 1;
+}
+
+message NewBidRs {
+    BidRec rec = 1;
+}
+
+message CloseAuctionRq {
+    string auction_id = 1;
+}
+
+message CloseAuctionRs {
+    AuctionRec auction = 1;
+    BidRec top_bid = 2;
+}
+
+service Processor {
+    rpc NewAuction (NewAuctionRq) returns (NewAuctionRs);
+    rpc NewBid (NewBidRq) returns (NewBidRs);
+    rpc CloseAuction (CloseAuctionRq) returns (CloseAuctionRs);
+}

@@ -1,5 +1,6 @@
-// #![allow(unused)]
+#![allow(unused)]
 
+mod api;
 mod cmd;
 mod config;
 mod error;
@@ -7,10 +8,10 @@ mod prelude;
 
 use crate::prelude::*;
 use std::path::PathBuf;
-use tokio::time::{sleep, Duration};
 
 use structured_logger::{async_json::new_writer, Builder as LogBuilder};
 use tokio::io;
+use tonic::transport::Server;
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -23,7 +24,14 @@ async fn main() -> Result<()> {
 
     log::info!(conf = log::as_serde!(conf); "configuration");
 
-    sleep(Duration::from_millis(100)).await;
+    let addr = format!("127.0.0.1:{}", conf.port).parse()?;
+
+    Server::builder()
+        .add_service(api::spec_service()?)
+        .add_service(api::processor_server())
+        .add_service(api::querier_server())
+        .serve(addr)
+        .await?;
 
     Ok(())
 }

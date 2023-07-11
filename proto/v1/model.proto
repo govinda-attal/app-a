@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+package auction.v1;
+
+import "google/protobuf/timestamp.proto";
+
+enum AuctionStatus {
+    AUCTION_STATUS_UNSPECIFIED = 0;
+    AUCTION_STATUS_OPEN = 1;
+    AUCTION_STATUS_CLOSED = 2;
+    AUCTION_STATUS_CANCELLED = 3;
+}
+
+message AuctionInfo {
+    string item = 1;
+    string description = 2;
+    string seller = 3;
+    uint64 start_price = 4;
+    uint64 current_price = 5;
+}
+
+message AuctionRec {
+    string id = 1;
+    AuctionInfo info = 2;
+    AuctionStatus status = 3;
+    google.protobuf.Timestamp created_at = 4;
+    google.protobuf.Timestamp updated_at = 5;
+}
+
+enum BidStatus {
+    BID_STATUS_UNSPECIFIED = 0;
+    BID_STATUS_ACCEPTED = 1;
+    BID_STATUS_REJECTED = 2;
+    BID_STATUS_OVER_TURNED = 4;
+}
+
+
+message BidInfo {
+    string auction_id = 1;
+    string bidder = 2;
+    uint64 bid_price = 3;
+}
+
+message BidRec {
+    string id = 1;
+    BidInfo info = 2;
+    BidStatus status = 3;
+    google.protobuf.Timestamp created_at = 4;
+    google.protobuf.Timestamp updated_at = 5;
+}
+

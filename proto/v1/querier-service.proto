@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package auction.v1;
+
+import "model.proto";
+
+message QueryAuctionsRq {
+    AuctionStatus status = 1;
+}
+
+message QueryAuctionsRs {
+    repeated AuctionRec auctions = 1;
+}
+
+message FetchAuctionRq {
+    string auction_id = 1;
+}
+
+message FetchAuctionRs {
+    AuctionRec auction = 1;
+    BidRec top_bid = 2;
+    repeated BidRec bids = 3;
+}
+
+
+service Querier {
+    rpc QueryAuctions (QueryAuctionsRq) returns (QueryAuctionsRs);
+    rpc FetchAuction (FetchAuctionRq) returns (FetchAuctionRs);
+}
