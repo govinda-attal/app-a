@@ -25,10 +25,10 @@ use querier::QuerierImpl;
 use v1::processor_server::*;
 use v1::querier_server::*;
 
-pub fn processor_server() -> ProcessorServer<impl Processor> {
+pub fn processor_service() -> ProcessorServer<impl Processor> {
     ProcessorServer::new(ProcessorImpl {})
 }
 
-pub fn querier_server() -> QuerierServer<impl Querier> {
+pub fn querier_service() -> QuerierServer<impl Querier> {
     QuerierServer::new(QuerierImpl {})
 }

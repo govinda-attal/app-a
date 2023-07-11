@@ -11,7 +11,7 @@ use std::path::PathBuf;
 
 use structured_logger::{async_json::new_writer, Builder as LogBuilder};
 use tokio::io;
-use tonic::transport::Server;
+use tonic::transport::Server as TonicServer;
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -26,12 +26,12 @@ async fn main() -> Result<()> {
 
     log::info!("running server on port {}", conf.port);
 
-    Server::builder()
+    TonicServer::builder()
         .add_service(api::spec_service()?)
-        .add_service(api::processor_server())
-        .add_service(api::querier_server())
+        .add_service(api::processor_service())
+        .add_service(api::querier_service())
         .serve(addr)
         .await?;
-    
+
     Ok(())
 }
