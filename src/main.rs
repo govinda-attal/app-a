@@ -22,9 +22,9 @@ async fn main() -> Result<()> {
         .with_default_writer(new_writer(io::stdout()))
         .init();
 
-    log::info!(conf = log::as_serde!(conf); "configuration");
-
     let addr = format!("127.0.0.1:{}", conf.port).parse()?;
+
+    log::info!("running server on port {}", conf.port);
 
     Server::builder()
         .add_service(api::spec_service()?)
@@ -32,6 +32,7 @@ async fn main() -> Result<()> {
         .add_service(api::querier_server())
         .serve(addr)
         .await?;
-
+    
+    log::info!("server stopped");
     Ok(())
 }
