@@ -33,6 +33,5 @@ async fn main() -> Result<()> {
         .serve(addr)
         .await?;
     
-    log::info!("server stopped");
     Ok(())
 }
