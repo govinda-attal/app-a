@@ -1,0 +1,115 @@
+version: '3.8'
+services:
+  traefik:
+    image: traefik:v2.9
+    container_name: traefik
+    hostname: traefik
+    command:
+      - "--log.level=DEBUG"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      # - "--entrypoints.grpc.address=:9080"
+      - "--entrypoints.postgres.address=:5432"
+      - "--entrypoints.redpanda.address=:9092"
+      - "--api.dashboard=true"
+      - "--api.insecure=true"
+    networks:
+    - default
+    ports:
+      - "80:80"
+      - "9080:9080"
+      - "8080:8080"
+      - "9092:9092"
+      - "5432:5432"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+
+  app:
+    profiles:
+      - app
+      - minimal
+    hostname: app
+    container_name: app
+    image: app-a:latest
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    environment:
+      - APP_db_url=postgres://postgres:postgres@postgres:5432/postgres?sslmode=disable
+    # labels:
+    # - traefik.enable=true
+    # - traefik.http.routers.app.rule=Host(`app.localhost`)
+    # - traefik.http.routers.app.service=app
+    # - traefik.http.routers.app.entrypoints=grpc
+    # - traefik.http.services.app.loadbalancer.server.scheme=h2c
+    # - traefik.http.services.app.loadbalancer.server.port=7080
+    ports:
+    - 7080:7080
+    networks:
+    - default
+    depends_on:
+    - traefik
+  
+  grpcui:
+    profiles:
+      - app
+    container_name: grpcui
+    hostname: grpcui
+    image: wongnai/grpcui
+    labels:
+    - traefik.enable=true
+    - traefik.http.routers.grpcui.rule=Host(`grpcui.localhost`)
+    - traefik.http.routers.grpcui.service=grpcui
+    - traefik.http.routers.grpcui.entrypoints=web
+    - traefik.http.services.grpcui.loadbalancer.server.port=8080
+    environment:
+    - GRPCUI_SERVER=app:7080
+    networks:
+    - default
+    depends_on:
+    - traefik
+    - app
+    restart: always
+
+  postgres:
+    profiles:
+      - minimal
+      - db
+    image: postgres:14.1-alpine
+    container_name: postgres
+    hostname: postgres
+    restart: always
+    environment:
+    - POSTGRES_USER=postgres
+    - POSTGRES_PASSWORD=postgres
+    networks:
+    - default
+    labels:
+    - "traefik.enable=true"
+    - "traefik.tcp.routers.postgres.rule=HostSNI(`*`)"
+    - "traefik.tcp.routers.postgres.entrypoints=postgres"
+    - "traefik.tcp.services.postgres.loadbalancer.server.port=5432"
+
+  pgweb:
+    profiles:
+      - db
+    container_name: pgweb
+    hostname: pgweb
+    restart: always
+    image: sosedoff/pgweb
+    environment:
+    - PGWEB_DATABASE_URL=postgres://postgres:postgres@postgres:5432/postgres?sslmode=disable
+    depends_on:
+    - postgres
+    - traefik
+    networks:
+    - default
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.pgweb.rule=Host(`pgweb.localhost`)"
+    - "traefik.http.routers.pgweb.entrypoints=web"
+    - "traefik.http.services.pgweb.loadbalancer.server.port=8081"
+
+networks:
+  default:

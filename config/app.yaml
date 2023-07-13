@@ -1,5 +1,6 @@
 log:
   level: INFO
-port: 9080
+port: 7080
 db:
-  url: postgres://localhost:5432/postgres
+  url: postgres://postgres:postgres@localhost:5432/postgres
+graceful_shutdown: 5

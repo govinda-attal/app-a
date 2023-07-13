@@ -1,0 +1,6 @@
+target/debug
+.vscode
+.gitignore
+Dockerfile
+docker-compose.yaml
+README.md

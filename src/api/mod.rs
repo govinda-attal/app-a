@@ -1,3 +1,4 @@
+use crate::db;
 use crate::prelude::*;
 mod processor;
 mod querier;
@@ -25,8 +26,10 @@ use querier::QuerierImpl;
 use v1::processor_server::*;
 use v1::querier_server::*;
 
-pub fn processor_service() -> ProcessorServer<impl Processor> {
-    ProcessorServer::new(ProcessorImpl {})
+pub fn processor_service(
+    repo: impl db::AuctionMgm + Sync + Send + 'static,
+) -> ProcessorServer<impl Processor> {
+    ProcessorServer::new(ProcessorImpl::new(repo))
 }
 
 pub fn querier_service() -> QuerierServer<impl Querier> {

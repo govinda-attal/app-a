@@ -1,29 +1,35 @@
 use crate::prelude::Result as AppResult;
+use config::Config;
 use serde::{Deserialize, Serialize};
-use std::path::PathBuf;
-use twelf::{config, Layer};
 
-pub fn load(path: PathBuf) -> AppResult<Config> {
-    let path = path.into();
-    // Layer from different sources to build configuration. Order matters!
-    let conf = Config::with_layers(&[Layer::Yaml(path), Layer::Env(Some(String::from("APP_")))])?;
+pub fn load(path: &str) -> AppResult<AppConfig> {
+    let config = Config::builder()
+        .add_source(config::File::with_name(path))
+        .add_source(
+            config::Environment::with_prefix("APP")
+                .separator("_"),
+        )
+        .build()?;
+
+    let conf: AppConfig = config.try_deserialize()?;
+
     Ok(conf)
 }
 
-#[config]
-#[derive(Debug, Default, Serialize)]
-pub struct Config {
+#[derive(Debug, Default, Serialize, serde_derive::Deserialize, PartialEq, Eq)]
+pub struct AppConfig {
     pub log: Log,
     pub port: u16,
     pub db: Database,
+    pub graceful_shutdown: u8,
 }
 
-#[derive(Debug, Default, Deserialize, Serialize)]
+#[derive(Debug, Default, Deserialize, Serialize, PartialEq, Eq)]
 pub struct Log {
     pub level: String,
 }
 
-#[derive(Debug, Default, Deserialize, Serialize)]
+#[derive(Debug, Default, Deserialize, Serialize, PartialEq, Eq)]
 pub struct Database {
     pub url: String,
 }

@@ -1,10 +1,10 @@
+use crate::prelude::*;
 use super::RpcResult;
 use crate::api::v1::querier_server::Querier;
 use crate::api::v1::*;
-use crate::prelude::*;
 
 use async_trait::async_trait;
-use tonic::{Request, Response, Status};
+use tonic::{Request, Status};
 
 #[derive(Debug, Default)]
 pub struct QuerierImpl {}
@@ -15,9 +15,9 @@ impl Querier for QuerierImpl {
         &self,
         request: Request<QueryAuctionsRq>,
     ) -> RpcResult<QueryAuctionsRs> {
-        Err(Status::unimplemented("todo!"))
+        Err(Error::Unimplemented(format!("query_auctions is not implemented")).into())
     }
     async fn fetch_auction(&self, request: Request<FetchAuctionRq>) -> RpcResult<FetchAuctionRs> {
-        Err(Status::unimplemented("todo!"))
+        Err(Error::Unimplemented(format!("fetch_auction is not implemented")).into())
     }
 }
