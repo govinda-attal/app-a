@@ -47,7 +47,7 @@ docker_up_minimal="docker compose --profile minimal up -d"
 docker_down_minimal="docker compose --profile minimal down"
 
 # Run full docker network includes application, postgres and supporting utilities
-full_docker_up="docker compose --profile=db,app up --build -d"
-full_docker_down="docker compose --profile=db,app down"
+full_docker_up="docker compose --profile=db --profile=app up --build -d"
+full_docker_down="docker compose --profile=db --profile=app down"
 
 db_migrate="sqlx migrate run --source './db/migrations' --database-url 'postgres://postgres:postgres@localhost/postgres?sslmode=disable'"
