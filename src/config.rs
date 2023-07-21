@@ -5,10 +5,7 @@ use serde::{Deserialize, Serialize};
 pub fn load(path: &str) -> AppResult<AppConfig> {
     let config = Config::builder()
         .add_source(config::File::with_name(path))
-        .add_source(
-            config::Environment::with_prefix("APP")
-                .separator("_"),
-        )
+        .add_source(config::Environment::with_prefix("APP").separator("_"))
         .build()?;
 
     let conf: AppConfig = config.try_deserialize()?;

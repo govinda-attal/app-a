@@ -1,7 +1,10 @@
+mod functions;
+pub mod model;
 mod repo;
 
 use crate::api::v1::{AuctionInfo, AuctionRec, BidInfo, BidRec};
 use crate::prelude::*;
+
 use async_trait::async_trait;
 use sqlx::PgPool;
 use std::sync::Arc;

@@ -4,6 +4,8 @@ use async_trait::async_trait;
 use sqlx::PgPool;
 use std::sync::Arc;
 
+use super::functions::create_auction;
+use super::model::Auction;
 use super::AuctionMgm;
 
 pub struct AuctionMgmRepo {
@@ -21,7 +23,11 @@ impl AuctionMgmRepo {
 #[async_trait]
 impl AuctionMgm for AuctionMgmRepo {
     async fn create_auction(&self, auction_info: &AuctionInfo) -> Result<AuctionRec> {
-        Err(Error::Unimplemented("create_auction is not implemented".into()))
+        let input = Auction::try_from(auction_info)?;
+        let mut tx = self.pool.clone().begin().await?;
+        let row = create_auction(&mut tx, input).await?;
+        tx.commit().await?;
+        Ok(AuctionRec::from(&row))
     }
 
     async fn create_bid(&self, auction_id: &str, bid_info: &BidInfo) -> Result<BidRec> {

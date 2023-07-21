@@ -6,17 +6,18 @@ import "google/protobuf/timestamp.proto";
 
 enum AuctionStatus {
     AUCTION_STATUS_UNSPECIFIED = 0;
-    AUCTION_STATUS_OPEN = 1;
-    AUCTION_STATUS_CLOSED = 2;
-    AUCTION_STATUS_CANCELLED = 3;
+    AUCTION_STATUS_DRAFT = 1;
+    AUCTION_STATUS_OPEN = 2;
+    AUCTION_STATUS_CLOSED = 3;
+    AUCTION_STATUS_CANCELLED = 4;
 }
 
 message AuctionInfo {
     string item = 1;
     string description = 2;
     string seller = 3;
-    uint64 start_price = 4;
-    uint64 current_price = 5;
+    uint32 start_price = 4;
+    uint32 current_price = 5;
 }
 
 message AuctionRec {
@@ -38,7 +39,7 @@ enum BidStatus {
 message BidInfo {
     string auction_id = 1;
     string bidder = 2;
-    uint64 bid_price = 3;
+    uint32 bid_price = 3;
 }
 
 message BidRec {

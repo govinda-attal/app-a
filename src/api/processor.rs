@@ -1,9 +1,10 @@
-use crate::prelude::*;
-use std::sync::Arc;
+use super::validations::*;
 use super::RpcResult;
 use crate::api::v1::*;
 use crate::db::AuctionMgm;
+use crate::prelude::*;
 use crate::{api::v1::processor_server::Processor, db};
+use std::sync::Arc;
 
 use async_trait::async_trait;
 use tonic::{Request, Response, Status};
@@ -22,13 +23,15 @@ impl ProcessorImpl {
 
 #[async_trait]
 impl Processor for ProcessorImpl {
-    async fn new_auction(&self, rq: Request<NewAuctionRq>) -> RpcResult<NewAuctionRs> {
-        // Will revist this for input validations in subsequent iterations
-        let info = rq.into_inner().info.unwrap_or_default();
+    async fn draft_auction(&self, rq: Request<DraftAuctionRq>) -> RpcResult<DraftAuctionRs> {
+        let info = rq.get_ref().validate()?.info.as_ref().unwrap();
 
         let rec = self.repo.clone().create_auction(&info).await?;
-        
-        Ok(Response::new(NewAuctionRs { rec: Some(rec) }))
+
+        Ok(Response::new(DraftAuctionRs { rec: Some(rec) }))
+    }
+    async fn start_auction(&self, rq: Request<StartAuctionRq>) -> RpcResult<StartAuctionRs> {
+        Err(Error::Unimplemented(format!("open_auction is not implemented")).into())
     }
     async fn new_bid(&self, rq: Request<NewBidRq>) -> RpcResult<NewBidRs> {
         Err(Error::Unimplemented(format!("new_bid is not implemented")).into())
@@ -47,17 +50,33 @@ mod tests {
     use super::*;
 
     #[tokio::test]
-    async fn test_new_auction_simple() {
+    async fn test_draft_auction_bad_request() {
+        let info = AuctionInfo::default();
+        let mut mock = MockAuctionMgm::new();
+        let processor = ProcessorImpl::new(mock);
+        let rs = processor
+            .draft_auction(Request::new(DraftAuctionRq {
+                info: Some(info.to_owned()),
+            }))
+            .await
+            .unwrap_err();
+
+        assert_eq!(rs.code(), tonic::Code::InvalidArgument);
+        assert_eq!(rs.message(), "info.item is required");
+    }
+
+    #[tokio::test]
+    async fn test_draft_auction_simple() {
         let info = AuctionInfo {
-            item: "item-x".into(),
-            description: "item x description".into(),
-            seller: "seller".into(),
+            item: f!("item-x"),
+            description: f!("item x description"),
+            seller: f!("seller"),
             start_price: 100,
             ..Default::default()
         };
 
         let auction_rec = &AuctionRec {
-            id: "id".into(),
+            id: f!("id"),
             created_at: Some(Timestamp::default()),
             updated_at: Some(Timestamp::default()),
             info: Some(info.clone()),
@@ -76,7 +95,7 @@ mod tests {
 
         let processor = ProcessorImpl::new(mock);
         let rs = processor
-            .new_auction(Request::new(NewAuctionRq {
+            .draft_auction(Request::new(DraftAuctionRq {
                 info: Some(info.to_owned()),
             }))
             .await

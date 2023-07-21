@@ -2,6 +2,7 @@ use crate::db;
 use crate::prelude::*;
 mod processor;
 mod querier;
+mod validations;
 
 use tonic_reflection::server::{ServerReflection, ServerReflectionServer};
 

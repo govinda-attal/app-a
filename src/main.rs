@@ -6,13 +6,14 @@ mod config;
 mod db;
 mod error;
 mod prelude;
+mod utils;
 
 use crate::prelude::*;
 use futures_util::FutureExt;
 use std::net::SocketAddr;
-use tokio::sync::oneshot::{Receiver, Sender};
-use tokio::sync::oneshot;
 use tokio::signal;
+use tokio::sync::oneshot;
+use tokio::sync::oneshot::{Receiver, Sender};
 
 use sqlx::PgPool;
 use structured_logger::{async_json::new_writer, Builder as LogBuilder};
@@ -53,7 +54,7 @@ async fn main() -> Result<()> {
 }
 
 async fn run_app(conf: config::AppConfig, tx: Sender<()>, rx: Receiver<()>) -> Result<()> {
-    let addr: SocketAddr = format!("0.0.0.0:{}", conf.port).parse()?;
+    let addr: SocketAddr = f!("0.0.0.0:{}", conf.port).parse()?;
 
     let pool = PgPool::connect(&conf.db.url).await?;
     log::info!("running db migrations");
@@ -74,7 +75,6 @@ async fn run_app(conf: config::AppConfig, tx: Sender<()>, rx: Receiver<()>) -> R
         .serve_with_shutdown(addr, rx.map(drop))
         .await?;
 
-    
     if let Err(_) = tx.send(()) {
         log::warn!("main thread dropped receiever");
     }
