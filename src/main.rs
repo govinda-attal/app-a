@@ -75,7 +75,7 @@ async fn run_app(conf: config::AppConfig, tx: Sender<()>, rx: Receiver<()>) -> R
         .serve_with_shutdown(addr, rx.map(drop))
         .await?;
 
-    if let Err(_) = tx.send(()) {
+    if tx.send(()).is_err() {
         log::warn!("main thread dropped receiever");
     }
     log::info!("application shutdown gracefully");

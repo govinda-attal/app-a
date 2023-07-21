@@ -26,7 +26,7 @@ impl Processor for ProcessorImpl {
     async fn draft_auction(&self, rq: Request<DraftAuctionRq>) -> RpcResult<DraftAuctionRs> {
         let info = rq.get_ref().validate()?.info.as_ref().unwrap();
 
-        let rec = self.repo.clone().create_auction(&info).await?;
+        let rec = self.repo.clone().create_auction(info).await?;
 
         Ok(Response::new(DraftAuctionRs { rec: Some(rec) }))
     }
