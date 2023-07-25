@@ -5,7 +5,8 @@ package auction.v1;
 import "model.proto";
 
 message QueryAuctionsRq {
-    AuctionStatus status = 1;
+    string seller = 1;
+    AuctionStatus status = 2;
 }
 
 message QueryAuctionsRs {
@@ -19,11 +20,19 @@ message FetchAuctionRq {
 message FetchAuctionRs {
     AuctionRec auction = 1;
     BidRec top_bid = 2;
-    repeated BidRec bids = 3;
+}
+
+message QueryBidsRq {
+    string auction_id = 1;
+}
+
+message QueryBidsRs {
+    repeated BidRec bids = 1;
 }
 
 
 service Querier {
     rpc QueryAuctions (QueryAuctionsRq) returns (QueryAuctionsRs);
     rpc FetchAuction (FetchAuctionRq) returns (FetchAuctionRs);
+    rpc QueryBids (QueryBidsRq) returns (QueryBidsRs);
 }

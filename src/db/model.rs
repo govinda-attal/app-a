@@ -3,7 +3,9 @@ use serde_derive::{Deserialize, Serialize};
 use sqlx::{encode::Encode, postgres::types::PgMoney};
 use uuid::Uuid;
 
-#[derive(strum_macros::Display, Clone, Debug, Default, Serialize, Deserialize, sqlx::Type)]
+#[derive(
+    strum_macros::Display, Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize, sqlx::Type,
+)]
 #[sqlx(type_name = "AUCTION_STATUS", rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum AuctionStatus {
     #[default]
@@ -13,10 +15,16 @@ pub enum AuctionStatus {
     Cancelled,
 }
 
-#[derive(strum_macros::Display, Clone, Debug, Default, Serialize, Deserialize, sqlx::Type)]
+#[derive(PartialEq, Debug, sqlx::Decode, sqlx::Encode)]
+pub struct AuctionStatuses(pub Vec<AuctionStatus>);
+
+#[derive(
+    strum_macros::Display, Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize, sqlx::Type,
+)]
 #[sqlx(type_name = "BID_STATUS", rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum BidStatus {
     #[default]
+    Empty,
     Accepted,
     Rejected,
     OverTurned,

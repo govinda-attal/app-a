@@ -38,11 +38,20 @@ message CloseAuctionRs {
     BidRec top_bid = 2;
 }
 
+message CancelAuctionRq {
+    string auction_id = 1;
+}
+
+message CancelAuctionRs {
+    AuctionRec auction = 1;
+}
+
 
 
 service Processor {
     rpc DraftAuction (DraftAuctionRq) returns (DraftAuctionRs);
     rpc StartAuction (StartAuctionRq) returns (StartAuctionRs);
     rpc CloseAuction (CloseAuctionRq) returns (CloseAuctionRs);
+    rpc CancelAuction (CancelAuctionRq) returns (CancelAuctionRs);
     rpc NewBid (NewBidRq) returns (NewBidRs);
 }

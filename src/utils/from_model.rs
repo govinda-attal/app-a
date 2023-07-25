@@ -58,3 +58,37 @@ impl From<&model::AuctionStatus> for v1::AuctionStatus {
         }
     }
 }
+
+impl From<&model::Bid> for v1::BidRec {
+    fn from(val: &model::Bid) -> Self {
+        v1::BidRec {
+            id: val.id.unwrap().to_string(),
+            info: Some(v1::BidInfo::from(val)),
+            status: v1::BidStatus::from(&val.status) as i32,
+            created_at: W(val.created_at.as_ref()).into(),
+            updated_at: W(val.last_updated_at.as_ref()).into(),
+        }
+    }
+}
+
+impl From<&model::Bid> for v1::BidInfo {
+    fn from(val: &model::Bid) -> Self {
+        v1::BidInfo {
+            auction_id: val.auction_id.to_string(),
+            bid_price: val.bid_price as u32,
+            bidder: val.bidder.clone(),
+        }
+    }
+}
+
+impl From<&model::BidStatus> for v1::BidStatus {
+    fn from(s: &model::BidStatus) -> Self {
+        use model::BidStatus;
+        match s {
+            BidStatus::Accepted => Self::Accepted,
+            BidStatus::OverTurned => Self::OverTurned,
+            BidStatus::Rejected => Self::Rejected,
+            BidStatus::Empty => Self::Unspecified,
+        }
+    }
+}

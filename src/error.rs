@@ -16,6 +16,9 @@ pub enum Error {
     AddrParseError(#[from] std::net::AddrParseError),
 
     #[error(transparent)]
+    UuidParseError(#[from] uuid::Error),
+
+    #[error(transparent)]
     TonicTransportError(#[from] tonic::transport::Error),
 
     #[error(transparent)]

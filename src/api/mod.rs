@@ -28,11 +28,14 @@ use v1::processor_server::*;
 use v1::querier_server::*;
 
 pub fn processor_service(
-    repo: impl db::AuctionMgm + Sync + Send + 'static,
+    mgm_repo: impl db::AuctionMgm + Sync + Send + 'static,
+    qry_repo: impl db::AuctionQuerier + Send + Sync + 'static,
 ) -> ProcessorServer<impl Processor> {
-    ProcessorServer::new(ProcessorImpl::new(repo))
+    ProcessorServer::new(ProcessorImpl::new(mgm_repo, qry_repo))
 }
 
-pub fn querier_service() -> QuerierServer<impl Querier> {
-    QuerierServer::new(QuerierImpl {})
+pub fn querier_service(
+    qry_repo: impl db::AuctionQuerier + Send + Sync + 'static,
+) -> QuerierServer<impl Querier> {
+    QuerierServer::new(QuerierImpl::new(qry_repo))
 }

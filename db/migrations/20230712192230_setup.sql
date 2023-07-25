@@ -40,7 +40,7 @@ CREATE TABLE BIDS (
     FOREIGN KEY (AUCTION_ID) REFERENCES AUCTIONS (ID)
 );
 
-CREATE FUNCTION update_last_updated_auctions() RETURNS TRIGGER AS $$ BEGIN NEW.LAST_UPDATED = now();
+CREATE FUNCTION update_last_updated_auctions() RETURNS TRIGGER AS $$ BEGIN NEW.LAST_UPDATED_AT = now();
 RETURN NEW;
 END;
 $$ language 'plpgsql';
@@ -49,7 +49,7 @@ CREATE TRIGGER update_auctions_last_updated BEFORE
 UPDATE
 	ON AUCTIONS FOR EACH ROW EXECUTE PROCEDURE update_last_updated_auctions();
 
-CREATE FUNCTION update_last_updated_bids() RETURNS TRIGGER AS $$ BEGIN NEW.LAST_UPDATED = now();
+CREATE FUNCTION update_last_updated_bids() RETURNS TRIGGER AS $$ BEGIN NEW.LAST_UPDATED_AT = now();
 RETURN NEW;
 END;
 $$ language 'plpgsql';
@@ -57,3 +57,12 @@ $$ language 'plpgsql';
 CREATE TRIGGER update_bids_last_updated BEFORE
 UPDATE
 	ON BIDS FOR EACH ROW EXECUTE PROCEDURE update_last_updated_bids();
+
+
+CREATE INDEX auctions_seller_index ON AUCTIONS (SELLER) WITH (deduplicate_items = off);
+CREATE INDEX auctions_status_index ON AUCTIONS (STATUS) WITH (deduplicate_items = off);
+CREATE INDEX auctions_last_updated_at_index ON AUCTIONS (LAST_UPDATED_AT DESC) WITH (deduplicate_items = off);
+
+CREATE INDEX bids_bidder_index ON BIDS (BIDDER) WITH (deduplicate_items = off);
+CREATE INDEX bids_bid_price_index ON BIDS (BID_PRICE DESC) WITH (deduplicate_items = off);
+CREATE INDEX bids_status_index ON BIDS (STATUS) WITH (deduplicate_items = off);

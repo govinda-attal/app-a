@@ -66,12 +66,13 @@ async fn run_app(conf: config::AppConfig, tx: Sender<()>, rx: Receiver<()>) -> R
         conf.db.url
     );
 
-    let repo = db::new_repo(pool);
+    let mgm_repo = db::new_mgm(pool.clone());
+    let qry_repo = db::new_querier(pool.clone());
 
     TonicServer::builder()
         .add_service(api::spec_service()?)
-        .add_service(api::processor_service(repo))
-        .add_service(api::querier_service())
+        .add_service(api::processor_service(mgm_repo, qry_repo.clone()))
+        .add_service(api::querier_service(qry_repo))
         .serve_with_shutdown(addr, rx.map(drop))
         .await?;
 
